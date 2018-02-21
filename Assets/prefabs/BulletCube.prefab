@@ -26,6 +26,7 @@ GameObject:
   - component: {fileID: 114826738386956850}
   - component: {fileID: 114998213950705226}
   - component: {fileID: 114300625318551404}
+  - component: {fileID: 114717541617912436}
   m_Layer: 0
   m_Name: BulletCube
   m_TagString: Untagged
@@ -296,6 +297,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   amountOfDamageToDo: 6
+--- !u!114 &114717541617912436
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1171524739748326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69819a0c134e241f58a9fd1310ec3b5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  p1FinMaterial: {fileID: 2100000, guid: f0ad508c0e85f4636b1aa86705aff8f3, type: 2}
+  p2FinMaterial: {fileID: 2100000, guid: 02a000fc00a0544ac8d4c6b73cd2fc5c, type: 2}
+  p1BodyMaterial: {fileID: 2100000, guid: 84112ffa150224f49a4c5901e4f91d46, type: 2}
+  p2BodyMaterial: {fileID: 2100000, guid: d499153c6f9644f3eb52f5c8819db55b, type: 2}
 --- !u!114 &114826738386956850
 MonoBehaviour:
   m_ObjectHideFlags: 1

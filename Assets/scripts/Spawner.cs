@@ -9,15 +9,23 @@ public class Spawner : MonoBehaviour
 	[Range (2, 100)]
 	public int numToSpawn;
 	public bool useWaypoints = true;
+	public float minSpawnSize;
+	public float maxSpawnSize;
+
 	public KeyCode regenKey;
 
 	private GameObject[] waypoints;
 	private GameObject[] spawns;
 	private BoxCollider spawnLimitsBox;
+    private GameObject mobsParent;
 
 	void Start ()
 	{
-		spawnLimitsBox = GetComponent<BoxCollider> ();
+        mobsParent = GameObject.Find("Mobs");
+        if (!mobsParent) {
+            Debug.LogError("No Mobs object found in scene");
+        }
+        spawnLimitsBox = GetComponent<BoxCollider> ();
 		if (useWaypoints) {
 			waypoints = GameObject.FindGameObjectsWithTag ("Waypoint");
 		}
@@ -42,9 +50,12 @@ public class Spawner : MonoBehaviour
 		spawns = new GameObject [numToSpawn];
 		for (int i = 0; i < numToSpawn; i++) {
 			Vector3 pos = useWaypoints ? RandomWaypoint () : RandomPosition ();
-			GameObject clone = Instantiate (objectToSpawn, pos, Quaternion.identity);
+            GameObject clone = Instantiate (objectToSpawn, pos, 
+                                            Quaternion.identity, 
+                                            mobsParent.transform);
 			clone.transform.Rotate (Vector3.up, Random.Range (0, 360));
-			float d = Random.Range (0.3f, 1.2f);
+
+			float d = Random.Range (minSpawnSize, maxSpawnSize);
 			clone.transform.localScale = new Vector3 (d, d, d);
 			spawns [i] = clone;
 		}

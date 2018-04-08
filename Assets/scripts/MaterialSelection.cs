@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MaterialSelection : MonoBehaviour
 {
@@ -13,11 +11,12 @@ public class MaterialSelection : MonoBehaviour
 
 	void Start ()
 	{
-		ColorForPlayerNumber ();
+        ChooseColoursUsingPlayerNumber ();
 	}
 
-	void ColorForPlayerNumber ()
+	void ChooseColoursUsingPlayerNumber ()
 	{
+        Debug.Log("choosing colours for player number " + playerNumber);
 		Material fm = p1FinMaterial;
 		Material bm = p1BodyMaterial;
 		if (playerNumber == 2) {
@@ -30,10 +29,10 @@ public class MaterialSelection : MonoBehaviour
 		}
 	}
 
-	public void SetPlayer (int n)
+	public void SetPlayerNumber (int n)
 	{
 		playerNumber = n;
-		ColorForPlayerNumber ();
+		ChooseColoursUsingPlayerNumber ();
 	}
 	
 }

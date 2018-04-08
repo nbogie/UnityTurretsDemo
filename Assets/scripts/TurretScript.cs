@@ -2,14 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurretScript : MonoBehaviour {
-	public GameObject bulletOrig;
+public class TurretScript : MonoBehaviour
+{
+    public enum ControlSet { LeftCluster, RightCluster};
 
-	[Range(1, 10)]
+    public ControlSet controlSet;
+    private Animator animator;
+
+	[Range (1, 10)]
 	public int bulletAmount;
-	public Transform firingTransform;
-	public GameObject turretCylinder;
 
+    [Header("Wiring")]
+    public GameObject bulletPrefab;
+    public Transform firingTransform;
+	public GameObject turretCylinder;
+    private GameObject projectilesParent;
+
+    [Header("Control Keys")]
 	public KeyCode keyTurretUp;
 	public KeyCode keyTurretDown;
 	public KeyCode keyRotateLeft;
@@ -21,81 +30,93 @@ public class TurretScript : MonoBehaviour {
 	public int playerNumber;
 	public string controlPrefix;
 
-	void Start () {
-		bulletAmount = 1;	
+	void Start ()
+	{
+        animator = GetComponent<Animator>();
+        projectilesParent = GameObject.Find("Projectiles");
+        bulletAmount = 1;
 	}
 
-	private string horizAxisName(){
+	private string horizAxisName ()
+	{
 		return controlPrefix + "Horizontal";
 	}
-	private string verticalAxisName(){
+
+	private string verticalAxisName ()
+	{
 		return controlPrefix + "Vertical";
 	}
-	private string Fire1ButtonName(){
-		return controlPrefix + "Fire1";
-	}
-	private string Fire2ButtonName(){
-		return controlPrefix + "Fire2";
-	}
-	private string Fire3ButtonName(){
-		return controlPrefix + "Fire3";
-	}
-	private string Fire4ButtonName(){
-		return controlPrefix + "Fire4";
-	}
-	private string Fire5ButtonName(){
-		return controlPrefix + "Fire5";
-	}
-	private string Fire6ButtonName(){
-		return controlPrefix + "Fire6";
-	}
-	private string Fire8ButtonName(){
-		return controlPrefix + "Fire8";
-	}
-	private string Fire9ButtonName(){
-		return controlPrefix + "Fire9";
-	}
 
-	void Update () {
+    bool PlayerButtonDown(string suffix)
+    {
+        return Input.GetButtonDown(controlPrefix + suffix);
+    }
+    bool PlayerButtonUp(string suffix)
+    {
+        return Input.GetButtonUp(controlPrefix + suffix);
+    }
+
+	void Update ()
+	{
 		//UP and DOWN: rotate turret cylinder without changing turret base (a parent)
-		if (Input.GetKey(keyTurretUp) || Input.GetAxis(verticalAxisName()) < -0.1) {
-			turretCylinder.transform.Rotate(Vector3.up, 5);
+		if (Input.GetKey (keyTurretUp) || Input.GetAxis (verticalAxisName ()) < -0.1) {
+			turretCylinder.transform.Rotate (Vector3.up, 5);
 		}
-		if (Input.GetKey(keyTurretDown) || Input.GetAxis(verticalAxisName()) > 0.1) {
-			turretCylinder.transform.Rotate(Vector3.down, 5);
+		if (Input.GetKey (keyTurretDown) || Input.GetAxis (verticalAxisName ()) > 0.1) {
+			turretCylinder.transform.Rotate (Vector3.down, 5);
 		}
 
 		//LEFT and RIGHT: rotate turret base
-		if (Input.GetKey(keyRotateLeft) || Input.GetAxis(horizAxisName()) < -0.1) {
-			transform.Rotate(Vector3.down, 3);
+		if (Input.GetKey (keyRotateLeft) || Input.GetAxis (horizAxisName ()) < -0.1) {
+			transform.Rotate (Vector3.down, 3);
 		}
-		if (Input.GetKey(keyRotateRight)  || Input.GetAxis(horizAxisName()) > 0.1) {
-			transform.Rotate(Vector3.up, 3);
+		if (Input.GetKey (keyRotateRight) || Input.GetAxis (horizAxisName ()) > 0.1) {
+			transform.Rotate (Vector3.up, 3);
 		}
+        if (Input.GetKeyDown(keyFire) || PlayerButtonDown("Fire1"))
+        {
+            animator.SetBool("isFiring", true);
+        }
+        if (Input.GetKeyUp(keyFire) || PlayerButtonUp("Fire1"))
+        {
+            animator.SetBool("isFiring", false);
 
-		//FWD and BACK: move turret base on its right vector
-		if (Input.GetKey(keyForward) || Input.GetButton(Fire6ButtonName())) {
-			transform.Translate (Vector3.right *0.1f);
-		}
-		if (Input.GetKey(keyBack) || Input.GetButton(Fire5ButtonName())) {
-			transform.Translate (-Vector3.right * 0.1f);
-		}
+        }
 
 
-		if (Input.GetKeyDown (keyFire) || Input.GetButtonDown(Fire1ButtonName())) {
-			for (int i = 0; i < bulletAmount; i++) {
-				fireBullet ();
-			}
-		} 
 	}
-	void fireBullet() {
+
+	void FixedUpdate ()
+	{
+		//FWD and BACK: move turret base on its right vector
+		if (Input.GetKey (keyForward) || PlayerButtonDown ("Fire6")) {
+			TryToTranslate (Vector3.right * 5);
+				
+		}
+		if (Input.GetKey (keyBack) || PlayerButtonDown ("Fire5")) {
+			TryToTranslate (-Vector3.right * 5);
+		}
+
+
+	}
+
+	void TryToTranslate (Vector3 offset)
+	{
+		transform.Translate (offset * Time.deltaTime);
+
+	}
+
+	void FireBullet ()
+	{
 		//https://www.youtube.com/watch?v=4rZAAHevq1s
-		GameObject clone = Instantiate (bulletOrig, firingTransform.position, firingTransform.rotation);
-		Rigidbody rb = clone.GetComponent<Rigidbody> ();
+		GameObject clone = Instantiate (bulletPrefab, firingTransform.position, 
+                                        firingTransform.rotation, 
+                                        projectilesParent.transform);
+		Rigidbody bulletRB = clone.GetComponent<Rigidbody> ();
 		float deltaTime = 1.5f;
 		float power = 100 + Mathf.Min (3, deltaTime) * 300;
-		rb.AddRelativeForce (Vector3.forward * power, ForceMode.Acceleration);
-		clone.GetComponent<MaterialSelection> ().SetPlayer(playerNumber);
+		bulletRB.AddRelativeForce (Vector3.forward * power, ForceMode.Acceleration);
+		clone.GetComponent<MaterialSelection>().SetPlayerNumber (playerNumber);
 
 	}
 }
